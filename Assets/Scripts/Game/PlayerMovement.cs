@@ -1,41 +1,41 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public KeyCode up;
-    public KeyCode down;
     private Rigidbody2D myRB;
-    [SerializeField]
-    private float speed;
+    [SerializeField] private float speed;
+    private float moveInput;
     private float limitSuperior;
     private float limitInferior;
-    public int player_lives = 4;
-    // Start is called before the first frame update
+    public int player_lives = 3;
+
     void Start()
     {
-        if (up == KeyCode.None) up = KeyCode.UpArrow;
-        if (down == KeyCode.None) down = KeyCode.DownArrow;
         myRB = GetComponent<Rigidbody2D>();
         SetMinMax();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnMovement(InputAction.CallbackContext context)
     {
-        if (Input.GetKey(up) && transform.position.y < limitSuperior)
+        moveInput = context.ReadValue<float>();
+    }
+
+    void FixedUpdate()
+    {
+        float moveVelocity = moveInput * speed;
+        float newPositionY = transform.position.y + moveVelocity * Time.fixedDeltaTime;
+        if (newPositionY > limitSuperior)
         {
-            myRB.velocity = new Vector2(0f, speed);
+            newPositionY = limitSuperior;
         }
-        else if (Input.GetKey(down) && transform.position.y > limitInferior)
+        else if (newPositionY < limitInferior)
         {
-            myRB.velocity = new Vector2(0f, -speed);
+            newPositionY = limitInferior;
         }
-        else
-        {
-            myRB.velocity = Vector2.zero;
-        }
+        transform.position = new Vector3(transform.position.x, newPositionY, transform.position.z);
     }
 
     void SetMinMax()
