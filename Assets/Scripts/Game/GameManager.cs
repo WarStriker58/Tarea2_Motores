@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
     private bool isPaused = false;
     private AudioSource bgMusic;
     private PlayerMovement playerMovement;
+    public Text livesText;
 
     private void Awake()
     {
@@ -36,6 +38,10 @@ public class GameManager : MonoBehaviour
             UpdateDistanceScore();
         }
         UpdateUIText();
+        if (playerMovement != null && playerMovement.player_lives <= 0)
+        {
+            GameOver();
+        }
     }
 
     public void AddPoints(int pointsToAdd)
@@ -74,5 +80,10 @@ public class GameManager : MonoBehaviour
         {
             playerMovement.enabled = !isPaused;
         }
+    }
+
+    private void GameOver()
+    {
+        SceneManager.LoadScene("GameOver");
     }
 }

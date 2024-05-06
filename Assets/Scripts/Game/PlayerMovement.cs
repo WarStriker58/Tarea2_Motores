@@ -56,6 +56,8 @@ public class PlayerMovement : MonoBehaviour
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -64,11 +66,13 @@ public class PlayerMovement : MonoBehaviour
     private float limitSuperior;
     private float limitInferior;
     public int player_lives = 3;
+    public Text livesText;
 
     void Start()
     {
         myRB = GetComponent<Rigidbody2D>();
         SetMinMax();
+        UpdateLivesText();
     }
 
     void Update()
@@ -89,6 +93,41 @@ public class PlayerMovement : MonoBehaviour
         if (other.tag == "Candy")
         {
             CandyGenerator.instance.ManageCandy(other.gameObject.GetComponent<CandyController>(), this);
+        }
+        else if (other.tag == "LifeItem")
+        {
+            LifeController lifeItem = other.GetComponent<LifeController>();
+            IncreaseLives(lifeItem.lifeIncrease);
+            Destroy(other.gameObject);
+        }
+        else if (other.tag == "Enemy")
+        {
+            TakeDamage(1);
+        }
+    }
+
+    public void IncreaseLives(int amount)
+    {
+        player_lives += amount;
+        UpdateLivesText();
+    }
+
+    public void TakeDamage(int damageAmount)
+    {
+        player_lives -= damageAmount;
+        UpdateLivesText();
+
+        if (player_lives <= 0)
+        {
+            SceneManager.LoadScene("GameOver");
+        }
+    }
+
+    void UpdateLivesText()
+    {
+        if (livesText != null)
+        {
+            livesText.text = "Lives: " + player_lives.ToString();
         }
     }
 }
