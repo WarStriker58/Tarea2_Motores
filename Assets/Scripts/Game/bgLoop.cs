@@ -7,7 +7,7 @@ public class bgLoop : MonoBehaviour
     public float speed = 0.25f;
     private Vector2 offset = Vector2.zero;
     private Material material;
-    // Start is called before the first frame update
+
     void Start()
     {
         material = GetComponent<Renderer>().material;

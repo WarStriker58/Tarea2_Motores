@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class CandyController : MonoBehaviour
 {
-    public int frame;
-    public int lifeChanges;
+    public int points = 10;
 
-    void Update()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (transform.position.x <= -Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0)).x)
+        if (other.CompareTag("Player"))
         {
-            CandyGenerator.instance.ManageCandy(this);
+            GameManager.instance.AddPoints(points);
+            Destroy(gameObject);
         }
     }
 }

@@ -1,17 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class CandyGenerator : MonoBehaviour
 {
     public static CandyGenerator instance;
-    public List<GameObject> Candies = new List<GameObject>();
-    private float time_to_create = 4f;
-    private float actual_time = 0f;
+    public List<GameObject> candyPrefabs = new List<GameObject>();
+    public float candySpeed = 2f;
+    private float timeToCreate = 1.5f;
+    private float actualTime = 0f;
     private float limitSuperior;
     private float limitInferior;
-    public List<GameObject> actual_candies = new List<GameObject>();
 
     void Awake()
     {
@@ -21,23 +20,19 @@ public class CandyGenerator : MonoBehaviour
         }
         instance = this;
     }
-    // Start is called before the first frame update
+
     void Start()
     {
         SetMinMax();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        actual_time += Time.deltaTime;
-        if (time_to_create <= actual_time)
+        actualTime += Time.deltaTime;
+        if (timeToCreate <= actualTime)
         {
-            GameObject candy = Instantiate(Candies[Random.Range(0, Candies.Count)],
-            new Vector3(transform.position.x, Random.Range(limitInferior, limitSuperior), 0f), Quaternion.identity);
-            candy.GetComponent<Rigidbody2D>().velocity = new Vector2(-2f, 0);
-            actual_time = 0f;
-            actual_candies.Add(candy);
+            CreateCandy();
+            actualTime = 0f;
         }
     }
 
@@ -48,29 +43,22 @@ public class CandyGenerator : MonoBehaviour
         limitSuperior = (bounds.y * 0.9f);
     }
 
-    public void ManageCandy(CandyController candy_script, PlayerMovement player_script = null)
+    void CreateCandy()
     {
-        if (player_script == null)
+        GameObject candyPrefab = candyPrefabs[Random.Range(0, candyPrefabs.Count)];
+        GameObject candy = Instantiate(candyPrefab, new Vector3(transform.position.x, Random.Range(limitInferior, limitSuperior), 0f), Quaternion.identity);
+        Rigidbody2D candyRB = candy.GetComponent<Rigidbody2D>();
+        if (candyRB != null)
         {
-            Destroy(candy_script.gameObject);
-            return;
+            candyRB.velocity = new Vector2(-candySpeed, 0);
         }
-        if (candy_script.frame == 3)
+        else
         {
-            SceneManager.LoadScene("GameOver");
-            return;
+            Debug.LogError("El caramelo no tiene Rigidbody2D.");
         }
-        int lives = player_script.player_lives;
-        int live_changer = candy_script.lifeChanges;
-        lives += live_changer;
-        print(lives);
-        if (lives <= 0)
-        {
-            SceneManager.LoadScene("GameOver");
-        }
-        player_script.player_lives = lives;
-        Destroy(candy_script.gameObject);
     }
 
-
+    public void ManageCandy(CandyController candyScript, PlayerMovement playerScript = null)
+    {
+    }
 }
